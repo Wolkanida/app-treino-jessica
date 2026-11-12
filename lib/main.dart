@@ -119,7 +119,12 @@ Expanded(
         title: Text(alunos[index]),
         subtitle: const Text('Treino Ativo'),
         onTap: () {
-          print('A abrir a ficha de: ${alunos[index]}');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FichaAlunoScreen(nomeAluno: alunos[index]),
+            ),
+          );
         },
       );
     },
@@ -133,6 +138,25 @@ Expanded(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+class FichaAlunoScreen extends StatelessWidget {
+  final String nomeAluno;
+
+  const FichaAlunoScreen({super.key, required this.nomeAluno});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Ficha de $nomeAluno'),
+        backgroundColor: Colors.pink,
+      ),
+      body: Center(
+        child: Text('Treinos e medidas de $nomeAluno entrarão aqui.'),
       ),
     );
   }
