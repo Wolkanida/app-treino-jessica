@@ -55,6 +55,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             TextButton(
               onPressed: () {
+                if (_nomeController.text.trim().isEmpty) {
+                  return;
+                }
                 setState(() {
                   alunos.add(_nomeController.text);              
                 });
