@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+Future<void> main() async {
+  await Supabase.initialize(
+    url: 'https://pgvilfwzefgrpcfcnajq.supabase.co',
+    publishableKey: 'sb_publishable_jFsCWl5Ha1JRhVjCnsJoZA_uN63FPEL',
+  );
   runApp(const MyApp());
 }
 
@@ -33,8 +38,20 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  List<String> alunos = ['Rafaela', 'Manuela', 'Sophia', 'Juliana', 'Villela', 'Mauricio'];
+  List<String> alunos = [];
   final TextEditingController _nomeController = TextEditingController();
+  @override
+  void initState() {
+    super. initState();
+    _carregarAlunos();
+  }
+
+  Future<void> _carregarAlunos() async {
+    final dados = await Supabase.instance.client.from('alunos').select().order('id', ascending: true);
+    setState(() {
+      alunos = dados.map<String>((linha) => linha['nome'] as String).toList();
+    });
+  }
 
   void _incrementCounter() {
     showDialog(
@@ -54,16 +71,17 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Text('Cancelar'),
             ),
             TextButton(
-              onPressed: () {
-                if (_nomeController.text.trim().isEmpty) {
+              onPressed: () async {
+                final nome = _nomeController.text.trim();
+                if (nome.isEmpty) {
                   return;
                 }
-                setState(() {
-                  alunos.add(_nomeController.text);              
-                });
+                await Supabase.instance.client.from('alunos').insert({'nome': nome});
+                if (!context.mounted) return;
                 _nomeController.clear();
                 Navigator.pop(context);
-              },
+                _carregarAlunos();
+                },
               child: const Text('Adicionar'),
             ),
           ],
