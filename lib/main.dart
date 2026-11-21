@@ -38,7 +38,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  List<String> alunos = [];
+  List<Map<String, dynamic>> alunos = [];
   final TextEditingController _nomeController = TextEditingController();
   @override
   void initState() {
@@ -49,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _carregarAlunos() async {
     final dados = await Supabase.instance.client.from('alunos').select().order('id', ascending: true);
     setState(() {
-      alunos = dados.map<String>((linha) => linha['nome'] as String).toList();
+      alunos = dados;
     });
   }
 
@@ -117,13 +117,45 @@ Expanded(
     itemBuilder: (context, index) {
       return ListTile(
         leading: const Icon(Icons.person, color: Colors.pink),
-        title: Text(alunos[index]),
+        title: Text(alunos[index]['nome']),
         subtitle: const Text('Treino do dia!'),
+        trailing: IconButton(
+  icon: const Icon(Icons.delete, color: Colors.red),
+  onPressed: () {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Excluir aluno!'),
+          content: Text('Tem certeza que deseja excluir ${alunos[index]['nome']}?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final id = alunos[index]['id'];
+                await Supabase.instance.client.from('alunos').delete().eq('id', id);
+                if (!context.mounted) return;
+                Navigator.pop(context);
+                _carregarAlunos();
+              },
+              child: const Text('Excluir'),
+            ),
+          ],
+        );
+      },
+    );
+  },
+),
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => FichaAlunoScreen(nomeAluno: alunos[index]),
+              builder: (context) => FichaAlunoScreen(nomeAluno: alunos[index]['nome']),
             ),
           );
         },
