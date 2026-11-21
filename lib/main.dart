@@ -40,6 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   List<Map<String, dynamic>> alunos = [];
   final TextEditingController _nomeController = TextEditingController();
+  final TextEditingController _telefoneController = TextEditingController();
   @override
   void initState() {
     super. initState();
@@ -59,9 +60,19 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Novo aluno'),
-          content: TextField(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [              
+          TextField(
             controller: _nomeController,
             decoration: const InputDecoration(hintText: 'Nome do aluno'),
+          ),
+          TextField(
+            controller: _telefoneController,
+            decoration: const InputDecoration(hintText: 'Telefone'),
+            keyboardType: TextInputType.phone,
+          ),
+            ],
           ),
           actions: [
             TextButton(
@@ -73,12 +84,17 @@ class _MyHomePageState extends State<MyHomePage> {
             TextButton(
               onPressed: () async {
                 final nome = _nomeController.text.trim();
+                final telefone = _telefoneController.text.trim();
                 if (nome.isEmpty) {
                   return;
                 }
-                await Supabase.instance.client.from('alunos').insert({'nome': nome});
+                await Supabase.instance.client.from('alunos').insert({
+                  'nome': nome,
+                  'telefone': telefone.isEmpty ? null : telefone,
+                });
                 if (!context.mounted) return;
                 _nomeController.clear();
+                _telefoneController.clear();
                 Navigator.pop(context);
                 _carregarAlunos();
                 },
