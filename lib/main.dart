@@ -171,7 +171,9 @@ Expanded(
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => FichaAlunoScreen(nomeAluno: alunos[index]['nome']),
+              builder: (context) => FichaAlunoScreen(
+                nomeAluno: alunos[index]['nome'],
+                telefone: alunos[index]['telefone']),
             ),
           );
         },
@@ -194,8 +196,9 @@ Expanded(
 
 class FichaAlunoScreen extends StatelessWidget {
   final String nomeAluno;
+  final String? telefone;
 
-  const FichaAlunoScreen({super.key, required this.nomeAluno});
+  const FichaAlunoScreen({super.key, required this.nomeAluno, required this.telefone});
 
   @override
   Widget build(BuildContext context) {
@@ -205,7 +208,13 @@ class FichaAlunoScreen extends StatelessWidget {
         backgroundColor: Colors.pink,
       ),
       body: Center(
-        child: Text('Treinos e medidas de $nomeAluno entrarão aqui.'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+          Text('Treinos e medidas de $nomeAluno entrarão aqui.'),
+          Text('Telefone/Whats para contato: ${telefone ?? 'Telefone não informado!'}'),
+          ],
+      ),
       ),
     );
   }
