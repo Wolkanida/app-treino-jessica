@@ -41,6 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Map<String, dynamic>> alunos = [];
   final TextEditingController _nomeController = TextEditingController();
   final TextEditingController _telefoneController = TextEditingController();
+  final TextEditingController _dataController = TextEditingController();
   @override
   void initState() {
     super. initState();
@@ -71,6 +72,22 @@ class _MyHomePageState extends State<MyHomePage> {
             controller: _telefoneController,
             decoration: const InputDecoration(hintText: 'Telefone'),
             keyboardType: TextInputType.phone,
+          ),
+                    TextField(
+            controller: _dataController,
+            decoration: const InputDecoration(hintText: 'Data de início'),
+            readOnly: true,
+            onTap: () async {
+              final data = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2020),
+                lastDate: DateTime(2100),
+              );
+              if (data != null) {
+                _dataController.text = '${data.day}/${data.month}/${data.year}';
+              }
+            },
           ),
             ],
           ),
@@ -173,7 +190,8 @@ Expanded(
             MaterialPageRoute(
               builder: (context) => FichaAlunoScreen(
                 nomeAluno: alunos[index]['nome'],
-                telefone: alunos[index]['telefone']),
+                telefone: alunos[index]['telefone'],
+                dataInicio: alunos[index]['data_inicio']),
             ),
           );
         },
@@ -197,9 +215,13 @@ Expanded(
 class FichaAlunoScreen extends StatelessWidget {
   final String nomeAluno;
   final String? telefone;
+  final String? dataInicio;
 
-  const FichaAlunoScreen({super.key, required this.nomeAluno, required this.telefone});
-
+  const FichaAlunoScreen({super.key, required this.nomeAluno, required this.telefone, required this.dataInicio});
+String _formatarData(String data) {
+  final partes = data.split('-');
+  return '${partes[2]}/${partes[1]}/${partes[0]}';
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -213,6 +235,9 @@ class FichaAlunoScreen extends StatelessWidget {
           children: [
           Text('Treinos e medidas de $nomeAluno entrarão aqui.'),
           Text('Telefone/Whats para contato: ${telefone ?? 'Telefone não informado!'}'),
+          Text('Data de Inicio: ${dataInicio ?? 'Data não informada, favor preencher'}',
+          style: TextStyle(color: dataInicio == null ? Colors.red : Colors.green),
+          ),
           ],
       ),
       ),
